@@ -1,6 +1,4 @@
 ﻿# Simulacion
-Utiliza las librerias de python pyqt5, pandas y matplotlib
-
-La carpeta files contiene archivos de prueba para el programa
+Utiliza las librerias de python pyqt5, pandas, matplotlib y numpy
 
 # Bajar el programa
