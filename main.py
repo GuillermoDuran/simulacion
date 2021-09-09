@@ -1,20 +1,12 @@
-from os import name, stat
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QRegExp, QSize, fixed, pyqtSlot, Qt
-from PyQt5.QtWidgets import QApplication, QBoxLayout, QColorDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLayout, QPushButton, QScrollArea, QSpacerItem, QTabWidget, QVBoxLayout, QWIDGETSIZE_MAX, QWidget, QInputDialog, QLineEdit, QFileDialog, QMdiSubWindow
-from matplotlib import scale
-from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.colors import cnames
-from matplotlib.figure import Figure
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-from pandas.core.accessor import PandasDelegate
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QSize
+from PyQt5.QtWidgets import QHBoxLayout, QMainWindow, QPushButton, QWidget
 import sys
 
-import stats
-import rannum
+import stats as sts
+import rannum as rn
+import forecasting as fcstng
+import simulations as sims
 
 class Ui_Main(QWidget):
 
@@ -40,29 +32,49 @@ class Ui_Main(QWidget):
         self.randButton.setMaximumSize(btnSize)
         self.randButton.clicked.connect(lambda: self.openRand())
 
+        self.forecastButton = QPushButton('Pronosticos', self.centralwidget)
+        self.forecastButton.setMaximumSize(btnSize)
+        self.forecastButton.clicked.connect(lambda: self.openForecasting())
+
+        self.simulationButton = QPushButton('Simulación', self.centralwidget)
+        self.simulationButton.setMaximumSize(btnSize)
+        self.simulationButton.clicked.connect(lambda: self.openSimulation())
+
         self.layout = QHBoxLayout(self.centralwidget)
         self.layout.addWidget(self.statsButton)
         self.layout.addWidget(self.randButton)
-        #self.layout.addStretch()
+        self.layout.addWidget(self.forecastButton)
+        self.layout.addWidget(self.simulationButton)
 
         MainWindow.setCentralWidget(self.centralwidget)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def openStats(self):
-        self.secondWindow = stats.Ui_Stats()
+
+        self.hide
+        self.secondWindow = sts.Ui_Stats()
         self.secondWindow.show()
 
     def openRand(self):
-        self.secondWindow = rannum.RandNum()
+
+        self.secondWindow = rn.RandNum()
         self.secondWindow.show()
 
-def main():
+    def openForecasting(self):
+
+        self.secondWindow = fcstng.Forecasting()
+        self.secondWindow.show()
+
+    def openSimulation(self):
+
+        self.secondWindow = sims.Simulation()
+        self.secondWindow.show()
+
+if __name__ == '__main__':
+    
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_Main()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    main()

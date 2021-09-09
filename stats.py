@@ -1,16 +1,10 @@
-from os import name
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QRegExp, fixed, pyqtSlot, Qt
-from PyQt5.QtWidgets import QApplication, QBoxLayout, QColorDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLayout, QMainWindow, QPushButton, QScrollArea, QSpacerItem, QVBoxLayout, QWIDGETSIZE_MAX, QWidget, QInputDialog, QLineEdit, QFileDialog, QMdiSubWindow
-from matplotlib import scale
+from PyQt5.QtWidgets import QColorDialog, QGroupBox, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton, QScrollArea, QVBoxLayout, QWidget, QFileDialog
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.colors import cnames
-from matplotlib.figure import Figure
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from pandas.core.accessor import PandasDelegate
 
 import dfModel
 
@@ -25,6 +19,7 @@ class Ui_Stats(QMainWindow):
         global conjuntoDatos 
         conjuntoDatos = []
         self.resize(813, 700)
+        self.setWindowTitle('Estadística')
 
         self.colorDialog = QColorDialog(self)
         
@@ -111,7 +106,6 @@ class Ui_Stats(QMainWindow):
 
     #def setupUi(self, MainWindow):
         
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("Estadistica", "Estadistica"))
@@ -123,59 +117,66 @@ class Ui_Stats(QMainWindow):
     def openFileNameDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Python Files (*.py)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","CSV files (*.csv)", options=options)
         if fileName:
             self.lineFileName.setText(fileName)
 
     def generateTable(self):
         global datos
-        datos = pd.read_csv(self.lineFileName.text())
+        if self.lineFileName.text() != '':
+            datos = pd.read_csv(self.lineFileName.text())
 
-        model = mod(datos)
-        table = QtWidgets.QTableView(parent=self)
-        table.setMinimumSize(750, 200)
-        table.setMaximumSize(750, 200)
-        table.setModel(model)
+            model = mod(datos)
+            table = QtWidgets.QTableView(parent=self)
+            table.setMinimumSize(750, 200)
+            table.setMaximumSize(750, 200)
+            table.setModel(model)
 
-        labelData = QtWidgets.QLabel()
-        labelData.setText("Dato a mostrar")
-        labelData.setFont(QtGui.QFont("Calibri", 10))
-        lineData = QtWidgets.QLineEdit()
-        lineData.setMaximumSize(100, 21)
-        lineData.setFont(QtGui.QFont("Calibri", 10))
+            labelData = QtWidgets.QLabel()
+            labelData.setText("Dato a mostrar")
+            labelData.setFont(QtGui.QFont("Calibri", 10))
+            lineData = QtWidgets.QLineEdit()
+            lineData.setMaximumSize(100, 21)
+            lineData.setFont(QtGui.QFont("Calibri", 10))
 
-        labelClasses = QtWidgets.QLabel()
-        labelClasses.setText("Cantidad de clases del histograma")
-        labelClasses.setFont(QtGui.QFont("Calibri", 10))
-        lineClasses = QtWidgets.QLineEdit()
-        lineClasses.setMaximumSize(100, 21)
-        lineClasses.setFont(QtGui.QFont("Calibri", 10))
+            labelClasses = QtWidgets.QLabel()
+            labelClasses.setText("Cantidad de clases del histograma")
+            labelClasses.setFont(QtGui.QFont("Calibri", 10))
+            lineClasses = QtWidgets.QLineEdit()
+            lineClasses.setMaximumSize(100, 21)
+            lineClasses.setFont(QtGui.QFont("Calibri", 10))
 
-        colorBtn = QPushButton()
-        colorBtn.setText("Seleccionar color")
-        colorBtn.setFont(QtGui.QFont("Calibri", 10))
-        colorBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        colorBtn.clicked.connect(lambda: self.selectColor())
+            colorBtn = QPushButton()
+            colorBtn.setText("Seleccionar color")
+            colorBtn.setFont(QtGui.QFont("Calibri", 10))
+            colorBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            colorBtn.clicked.connect(lambda: self.selectColor())
 
-        plotBtn = QPushButton()
-        plotBtn.setText("Mostrar resultados")
-        plotBtn.setFont(QtGui.QFont("Calibri", 10))
-        plotBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        plotBtn.clicked.connect(lambda: self.calcular(lineData.text(), int(lineClasses.text())))
+            plotBtn = QPushButton()
+            plotBtn.setText("Mostrar resultados")
+            plotBtn.setFont(QtGui.QFont("Calibri", 10))
+            plotBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            plotBtn.clicked.connect(lambda: self.calcular(lineData.text(), int(lineClasses.text())))
 
-        hElement = QWidget()
-        hLayout = QHBoxLayout()
-        hLayout.addWidget(labelData)
-        hLayout.addWidget(lineData)
-        hLayout.addWidget(labelClasses)
-        hLayout.addWidget(lineClasses)
-        hLayout.addWidget(colorBtn)
-        hLayout.addWidget(plotBtn)
-        hElement.setLayout(hLayout)
+            hElement = QWidget()
+            hLayout = QHBoxLayout()
+            hLayout.addWidget(labelData)
+            hLayout.addWidget(lineData)
+            hLayout.addWidget(labelClasses)
+            hLayout.addWidget(lineClasses)
+            hLayout.addWidget(colorBtn)
+            hLayout.addWidget(plotBtn)
+            hElement.setLayout(hLayout)
 
-        self.layout.addWidget(table)
-        self.layout.addWidget(hElement)
-        self.layout.addStretch()
+            self.layout.addWidget(table)
+            self.layout.addWidget(hElement)
+            self.layout.addStretch()
+        else:
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle('Error')
+            dlg.setText('Seleccione un archivo')
+            dlg.setIcon(QMessageBox.Information)
+            btn = dlg.exec()
 
     def selectColor(self):
         self.colorDialog.exec_()
@@ -273,7 +274,7 @@ class Ui_Stats(QMainWindow):
             elif self.layout.itemAt(i).widget() is None:
                 self.layout.removeItem(self.layout.itemAt(i))
 
-if __name__ == "__main__":
+if __name__ == "__stats__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = Ui_Stats()
